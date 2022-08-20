@@ -8,7 +8,8 @@ import pandas as pd
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 data = dict()
 
-for number in range(520000, 530000):
+# 520000, 530000
+for number in range(500000, 560000):
     codigo = f"SYGH00{number}"
     driver.get(f"https://cloud-deliveryservices.cl/item/PagarImpuesto/{codigo}")
 
@@ -24,11 +25,17 @@ for number in range(520000, 530000):
         data[codigo] = texto
         
     except:
-        print(f"An exception occurred: {codigo}")
+        try:
+            texto = driver.find_element(By.XPATH, "/html/body/div[1]/div/div/div[2]/div/div[1]/h3").text
+            data[codigo] = texto
+        except:
+            print(f"An exception occurred: {codigo}")
         
+    if number % 200 == 0:
+       df = pd.DataFrame.from_dict(data, orient='index')
+       df.to_csv("output.csv")
    
 
 driver.close()
-
 df = pd.DataFrame.from_dict(data, orient='index')
 df.to_csv("output.csv")
